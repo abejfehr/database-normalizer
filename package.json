@@ -1,0 +1,21 @@
+{
+  "name": "db-normalizer",
+  "version": "0.1.0",
+  "description": "A database normalizer written in JavaScript",
+  "main": "gruntfile.js",
+  "dependencies": {
+    "grunt": "~0.4.5"
+  },
+  "devDependencies": {
+    "grunt-contrib-concat": "^0.5.1",
+    "grunt-contrib-uglify": "^0.8.0",
+    "grunt-contrib-jshint": "^0.11.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-contrib-jasmine": "^0.8.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Abe Fehr",
+  "license": "MIT"
+}

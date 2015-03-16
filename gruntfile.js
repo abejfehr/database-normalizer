@@ -15,6 +15,7 @@ module.exports = function(grunt) {
           'dev/classes/Array.js',
           'dev/classes/DependencySet.js',
           'dev/classes/FunctionalDependency.js',
+          'dev/classes/Relation.js',
           'dev/parseInput.js',
           'dev/controllers/appController.js'
         ],
@@ -22,7 +23,7 @@ module.exports = function(grunt) {
       },
       cssprod: {
         src: [
-          'dev/*.css'
+          'dev/**/*.css'
         ],
         dest: 'prod/style.css'
       }

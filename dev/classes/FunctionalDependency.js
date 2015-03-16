@@ -33,7 +33,7 @@ function FunctionalDependency(lhs, rhs) {
   };
 
   this.toString = function() {
-    return this.lhs + ' \u2192 ' + this.rhs;
+    return this.lhs.join(', ') + ' \u2192 ' + this.rhs.join(', ');
   };
 
   this.print = function() {

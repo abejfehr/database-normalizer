@@ -3,48 +3,100 @@
   <head>
     <title>Database Normalizer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.14/angular.min.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Roboto:100,300' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="prod/style.css" media="screen" title="no title" charset="utf-8">
   </head>
   <body>
     <div ng-app="dbNormalizer" ng-controller="appController">
-      <textarea placeholder="Functional Dependencies go here..." ng-model="rawInput" style="width:400px;height:150px;"></textarea>
-      <button type="submit" ng-click="normalize()">DO!</button>
-      <h2>Attributes</h2>
-      <ul>
-        <li ng-repeat="attribute in functionalDependencies.attributeSet()">{{ attribute }}</li>
-      </ul>
-      <h2>Functional Dependencies</h2>
-      <ul>
-        <li ng-repeat="functionalDependency in functionalDependencies.elements">{{ functionalDependency.toString() }}</li>
-      </ul>
-      <h2>Single Right Hand Sides</h2>
-      <ul>
-        <li ng-repeat="functionalDependency in singleRightHandSides.elements">{{ functionalDependency.toString() }}</li>
-      </ul>
-      <h2>Min Cover: Merged Left Hand Sides</h2>
-      <ul>
-        <li ng-repeat="functionalDependency in minCover.elements">{{ functionalDependency.lhs + " &#x2192; " + functionalDependency.rhs }}</li>
-      </ul>
-      <h2>Candidate Key for all Attributes</h2>
-      <ul>
-        <li ng-repeat="functionalDependency in minCover.elements">{{ functionalDependency.lhs + " &#x2192; " + functionalDependency.rhs }}</li>
-      </ul>
-      <h2>All Candidate Keys(for small examples only)</h2>
-      <ul>
-        <li ng-repeat="functionalDependency in minCover.elements">{{ functionalDependency.lhs + " &#x2192; " + functionalDependency.rhs }}</li>
-      </ul>
-      <h2>Dependency Preserving, 3NF Tables</h2>
-      <ul>
-        <li ng-repeat="functionalDependency in minCover.elements">{{ functionalDependency.lhs + " &#x2192; " + functionalDependency.rhs }}</li>
-      </ul>
-      <h2>Lossless-Join, Dependency Preserving, 3NF tables</h2>
-      <ul>
-        <li ng-repeat="functionalDependency in minCover.elements">{{ functionalDependency.lhs + " &#x2192; " + functionalDependency.rhs }}</li>
-      </ul>
-      <h2>All Candidate Keys(for small examples only)</h2>
-      <ul>
-        <li ng-repeat="functionalDependency in minCover.elements">{{ functionalDependency.lhs + " &#x2192; " + functionalDependency.rhs }}</li>
-      </ul>
+      <header>
+        <div class="container">
+          <h1>Database Normalizer</h1>
+          <textarea placeholder="Functional Dependencies go here..." ng-model="rawInput"></textarea>
+          <div id="buttonContainer">
+            <button type="submit" ng-click="normalize()">Normalize</button>
+          </div>
+        </div>
+      </header>
+      <main>
+        <div class="container">
+          <div id="results">
+            <h1>Results</h1>
+            <section>
+              <h2>Attributes</h2>
+              <ul>
+                <li ng-repeat="attribute in functionalDependencies.attributeSet()">{{ attribute }}</li>
+              </ul>
+            </section>
+            <section>
+              <h2>Functional Dependencies</h2>
+              <ul>
+                <li ng-repeat="functionalDependency in functionalDependencies.elements">{{ functionalDependency.toString() }}</li>
+              </ul>
+            </section>
+            <section>
+              <h2>Substeps to find Minimal Cover</h2>
+              <h3>Single Right Hand Sides</h3>
+              <ul>
+                <li ng-repeat="functionalDependency in singleRightHandSides.elements">{{ functionalDependency.toString() }}</li>
+              </ul>
+              <h3>Removal of Redundant LHS Attributes</h3>
+              <ul>
+                <li ng-repeat="functionalDependency in removedLHSAttributes.elements">{{ functionalDependency.toString() }}</li>
+              </ul>
+              <h3>Removal of Redundant Dependencies</h3>
+              <ul>
+                <li ng-repeat="functionalDependency in removedRedundantDependencies.elements">{{ functionalDependency.toString() }}</li>
+              </ul>
+            </section>
+            <section>
+              <h2>Minimal Cover</h2>
+              <ul>
+                <li ng-repeat="functionalDependency in minCover.elements">{{ functionalDependency.toString() }}</li>
+              </ul>
+            </section>
+            <section>
+              <h2>Minimal Cover: Merged Left Hand Sides</h2>
+              <ul>
+                <li ng-repeat="functionalDependency in minCoverMergedLHS.elements">{{ functionalDependency.toString() }}</li>
+              </ul>
+            </section>
+            <section>
+              <h2>Candidate Key for all Attributes</h2>
+              <ul>
+                <li>{{ candidateKey.join(', ') }}</li>
+              </ul>
+            </section>
+            <section>
+              <h2>All Candidate Keys(for small examples only)</h2>
+              <ul>
+                <li ng-repeat="keys in allCandidateKeys">{{ keys.join(', ') }}</li>
+              </ul>
+            </section>
+            <section>
+              <h2>Dependency Preserving, 3NF Tables</h2>
+              <ul>
+                <li ng-repeat="table in dependencyPreserving3NFTables">{{ table.toString() }}</li>
+              </ul>
+            </section>
+            <section>
+              <h2>Lossless-Join, Dependency Preserving, 3NF Tables</h2>
+              <ul>
+                <li ng-repeat="table in losslessJoinDependencyPreserving3NFTables">{{ table.toString() }}</li>
+              </ul>
+            </section>
+          </div>
+          <div id="noResults">
+            <p>No results yet... why don't you enter some functional dependencies to begin?</p>
+          </div>
+        </div>
+      </main>
+      <footer>
+        <div class="container">
+          <h1>About this tool</h1>
+          <p>This Database Normalizer is a JavaScript version of a similar tool created by <a href="http://people.scs.carleton.ca/~ldnel/">Louis D. Nel</a> for <a href="http://www.carleton.ca/">Carleton University</a>. Any bugs can be reported <a href="#">here</a>.</p>
+          <p>Note that finding all candidate keys of a particular set only works if there are less than 10 attributes.</p>
+        </div>
+      </footer>
     </div>
     <script src="prod/script.js"></script>
   </body>

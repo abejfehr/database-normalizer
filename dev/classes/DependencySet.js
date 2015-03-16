@@ -105,7 +105,8 @@ function DependencySet() {
      */
 
     while(this.removeRedundantLeftHandAttributes(minCoverSoFar) > 0) { }
-
+    if($scope)
+      $scope.removedLHSAttributes = minCoverSoFar.copy();
 
     /*
      * Remove any unnecessary dependencies
@@ -120,6 +121,8 @@ function DependencySet() {
     }
 
     var minCover = minCoverSoFar;
+    if($scope)
+      $scope.removedRedundantDependencies = minCoverSoFar.copy();
 
     return minCover;
   };

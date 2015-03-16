@@ -727,7 +727,14 @@ angular.module('dbNormalizer', [])
   };
   $scope.reset = function() {
     $scope.functionalDependencies = null;
-    $scope.minCover = null;
     $scope.singleRightHandSides = null;
+    $scope.removedLHSAttributes = null;
+    $scope.removedRedundantDependencies = null;
+    $scope.minCover = null;
+    $scope.minCoverMergedLHS = null;
+    $scope.candidateKey = null;
+    $scope.allCandidateKeys = null;
+    $scope.dependencyPreserving3NFTables = null;
+    $scope.losslessJoinDependencyPreserving3NFTables = null;
   };
 }]);

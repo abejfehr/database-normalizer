@@ -1,3 +1,9 @@
+/**
+ * Overrides or adds a number of methods to the built-in Array type in
+ * JavaScript to make it behave more like an Attribute Set
+ */
+
+/* Returns a proper set of the elements in the Array */
 Array.prototype.set = function() {
   var arr = this;
   return this.sort().filter(function(item, pos) {
@@ -5,43 +11,43 @@ Array.prototype.set = function() {
   });
 };
 
+/**
+ * Returns a boolean of whether or not all the elements in the argument are
+ * contained in this Array
+ */
 Array.prototype.containsAll = function(otherArr) {
   var commonSet = [];
-  for(var i=0;i<otherArr.length;++i) {
-    if(this.indexOf(otherArr[i]) > -1) {
+  for(var i=0;i<otherArr.length;++i)
+    if(this.indexOf(otherArr[i]) > -1)
       commonSet.push(otherArr[i]);
-    }
-  }
   return (commonSet.length === otherArr.length);
 };
 
+/* Returns an exact copy of this Array */
 Array.prototype.copy = function() {
   return this.slice();
 };
 
-// attach the .equals method to Array's prototype to call it on any array
+/* Checks if another Array is equal to this one */
 Array.prototype.equals = function (array) {
-    // if the other array is a falsy value, return
-    if (!array)
-        return false;
+  /* First, discount equality based on falsy arrays or inconsistent lengths */
+  if (!array)
+    return false;
+  if (this.length != array.length)
+    return false;
 
-    // compare lengths - can save a lot of time
-    if (this.length != array.length)
+  /* Go through and check all the elements */
+  for (var i = 0, l=this.length; i < l; i++) {
+    /* Nested Arrays */
+    if (this[i] instanceof Array && array[i] instanceof Array) {
+      /* Recurse */
+      if (!this[i].equals(array[i]))
         return false;
-
-    for (var i = 0, l=this.length; i < l; i++) {
-        // Check if we have nested arrays
-        if (this[i] instanceof Array && array[i] instanceof Array) {
-            // recurse into the nested arrays
-            if (!this[i].equals(array[i]))
-                return false;
-        }
-        else if (this[i] != array[i]) {
-            // Warning - two different object instances will never be equal: {x:20} != {x:20}
-            return false;
-        }
     }
-    return true;
+    else if (this[i] != array[i])
+      return false;
+  }
+  return true;
 };
 
 Array.prototype.isEmpty = function() {
@@ -55,12 +61,12 @@ Array.prototype.remove = function(element) {
   }
 };
 
+/**
+ * Compute and return the closure of an attribute set with respect to a set of
+ * Functional Dependencies F. The closure are all those attributes that are
+ * implied by this with regards to F using Armstrong's axioms
+ */
 Array.prototype.closure = function(F) {
-  /*Compute and return the closure of an attribute set with respect to a set of functional
-   * dependencies F
-   * The closure are all those attributes that are implied by this wrt. F using
-   * Armstrong's axioms
-   */
 
   var previous = [];
 
@@ -70,9 +76,8 @@ Array.prototype.closure = function(F) {
     current = current.copy();
     for(var i=0;i<F.elements.length;++i) {
       var fd = F.elements[i];
-      if(current.containsAll(fd.lhs)) {
+      if(current.containsAll(fd.lhs))
         current = current.concat(fd.rhs).set();
-      }
     }
   }
 
@@ -85,24 +90,22 @@ Array.prototype.findCandidateKey = function(theFDs) {
     var a = this[i];
     var tryCandidate = candidateKey.copy();
     tryCandidate.remove(a);
-    if(tryCandidate.closure(theFDs).containsAll(this)) {
+    if(tryCandidate.closure(theFDs).containsAll(this))
       candidateKey = tryCandidate;
-    }
   }
 
   return candidateKey;
 };
 
+/*
+ * Return a Set of all the minimal candidate keys of a relation consisting of theAttributes
+ * with respect to the functional dependencies: theFDs
+ *
+ * Approach:
+ * Start with the complete set of attributes as a super key and recursively
+ * decompose it leaving only minimal keys.
+ */
 Array.prototype.allCandidateKeys = function(theFDs){
-  /*
-   * Return a Set of all the minimal candidate keys of a relation consisting of theAttributes
-   * with respect to the functional dependencies: theFDs
-   *
-   *
-   * Approach:
-   * Start with the complete set of attributes as a super key and recursively
-   * decompose it leaving only minimal keys.
-   */
 
   var MAX_NUMBER_OF_ATTRIBUTES_FOR_ALL_KEYS_FIND = 10;
 
@@ -119,38 +122,38 @@ Array.prototype.allCandidateKeys = function(theFDs){
 };
 
 
+/*
+ * Answers a Set of all the minimal candidate keys the a relation consisting of
+ * attributes: theAttrubutes
+ * with respect to a set of functional dependencies: theFDs
+ * given an initial set of super keys: superkeys.
+ *
+ * WARNING: this is a computationally expensive recursion (exponential time)
+ * It is intended for only small attributes sets.
+ * For large sets use the candidateKey() method that only finds one
+ * candidate key
+
+ * theAttributes: the attributes defining the relation
+ * theFDs: the functional dependencies that apply to the relation
+ * superkeys: a Set of superkeys of the relation wrt the functional dependencies.
+ *
+ * Approach:
+ * recursively try to minimize all the superkeys until only minimal keys are
+ * left and return that set
+ */
 Array.prototype.candidateKeys = function(superkeys, theFDs) {
-  /*
-   * Answer a Set of all the minimal candidate keys the a relation consisting of attributes: theAttrubutes
-   * with respect to a set of functional dependencies: theFDs
-   * given an initial set of super keys: superkeys.
-   *
-   * WARNING: this is a computationally expensive recursion (exponential time)
-   * It is intended for only small attributes sets.
-   * For large sets use the candidateKey() method that only finds one
-   * candidate key
 
-   * theAttributes: the attributes defining the relation
-   * theFDs: the functional dependencies that apply to the relation
-   * superkeys: a Set of superkeys of the relation wrt the functional dependencies.
-   *
-   * Approach:
-   * recursively try to minimize all the superkeys until only minimal keys are left and
-   * return that set
-   *
-   */
+  /* Base case */
+  if(superkeys.isEmpty()) return superkeys; // Return an empty set
 
-  //basis cases
-  if(superkeys.isEmpty()) return superkeys; //return an empty set
-
-  //recursive cases
+  /* Recursive cases */
   var aSuperkey = superkeys[0];
 
   superkeys.remove(aSuperkey);
 
 
   if(aSuperkey.length == 1){
-    //can't make it any smaller
+    // Can't make it any smaller
     var candidateKeys = [];
     candidateKeys.push(aSuperkey);
     candidateKeys = candidateKeys.concat(candidateKeys(superkeys, theFDs));
@@ -158,7 +161,7 @@ Array.prototype.candidateKeys = function(superkeys, theFDs) {
 
   }
 
-  //try removing an attribute to minimize the superkey
+  /* Try removing an attribute to minimize the superkey */
   var attributesToRemove = aSuperkey.copy();
   var newCandidates = [];
 
@@ -175,7 +178,6 @@ Array.prototype.candidateKeys = function(superkeys, theFDs) {
     candidateKeys2.push(aSuperkey);
     candidateKeys2 = candidateKeys2.concat(this.candidateKeys(superkeys, theFDs));
     return candidateKeys2;
-
   }
   else {
     var candidateKeys3 = [];
@@ -184,12 +186,9 @@ Array.prototype.candidateKeys = function(superkeys, theFDs) {
       var candidateKeyAsSet = [];
       candidateKeyAsSet.push(candidate);
       candidateKeys3 = candidateKeys3.concat(this.candidateKeys(candidateKeyAsSet, theFDs));
-
     }
     candidateKeys3 = candidateKeys3.concat(this.candidateKeys(superkeys, theFDs));
     return candidateKeys3;
-
-
   }
 
 };

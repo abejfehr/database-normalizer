@@ -1,11 +1,15 @@
+/**
+ * Relation between functional dependencies
+ *
+ * The constructor for this class only takes one argument, which is either a
+ * Functional Dependency or a list of Attributes
+ */
 function Relation(argument) {
-  /* create a relation out of the functional dependency FD
-   * The left hand side becomes the primary key
-   */
 
   this.attributes = []; //attributes or columns of the table
   this.primaryKey = []; //designated primary key
 
+  /* Constructor for when the argument is a Functional Dependency */
   this.constructWithFunctionalDependency = function(FD) {
 
     if(FD === null)
@@ -22,6 +26,7 @@ function Relation(argument) {
 
   };
 
+  /* Constructor for when the argument is a set of Attributes */
   this.constructWithAttributes = function(theAttributes) {
 
     var key = theAttributes.copy();
@@ -40,6 +45,7 @@ function Relation(argument) {
 
     this.attributes = [];
     this.attributes = this.attributes.concat(theAttributes);
+
     if(key !== null){
       this.primaryKey = [];
       this.primaryKey = this.primaryKey.concat(key);
@@ -52,6 +58,12 @@ function Relation(argument) {
   };
 
 
+  /**
+   * Prints out the Relation in the form: [ <keys> | <non-key attributes> ]
+   *
+   * Alternatively, if there are no non-key attributes then the relation will be
+   * printed without the pipe, like this: [ <keys> ]
+   */
   this.toString = function() {
     var returnString = "[";
 
@@ -68,7 +80,6 @@ function Relation(argument) {
       if(this.primaryKey.indexOf(a1) < 0) { values.push(a1); }
     }
 
-    // Don't show the bar if there aren't any non-key elements
     if(values.length > 0)
       returnString = returnString + " | ";
 
@@ -78,7 +89,7 @@ function Relation(argument) {
     return returnString;
   };
 
-  // The argument can either be an AttributeSet(array) or a FunctionalDependency
+  /* Decides which constructor to call based on the type of the argument */
   if(argument.constructor === Array) {
     this.constructWithAttributes(argument);
   } else {

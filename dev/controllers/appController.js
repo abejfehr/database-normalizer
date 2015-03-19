@@ -53,9 +53,9 @@ angular.module('dbNormalizer', [])
 
 
      /* Calculates the Minimal Cover with the Merged LHS */
-    //Merge all the functional dependencies in the minimal cover that have the same
-    //left hand side.
-    // e.g. replace X->Y, X->Z with X->Y,Z
+    /* Merge all the functional dependencies in the minimal cover that have the
+     * same left-hand-side.
+     * e.g. replace X -> Y, X -> Z with X -> Y, Z */
     $scope.minCoverMergedLHS = $scope.minCover.copy();
     var toMerge = $scope.minCoverMergedLHS.copy();
     var newMinCover = new DependencySet();
@@ -74,18 +74,18 @@ angular.module('dbNormalizer', [])
       }
       toMerge = $scope.minCoverMergedLHS.copy();
     }
-
     $scope.minCoverMergedLHS = newMinCover;
 
 
 
 
     /* The following is for the candidate key */
-
     var allAttributes = $scope.functionalDependencies.attributeSet();
 
-    //find all the candidate keys of a table consisting of all
-    //the attributes with respect to the functional dependencies
+    /**
+     * Find all the candidate keys of a table consisting of all the attributes
+     * with respect to the functional dependencies
+     */
     var candidateKey = allAttributes.findCandidateKey($scope.minCoverMergedLHS);
     $scope.candidateKey = candidateKey;
 
@@ -95,17 +95,13 @@ angular.module('dbNormalizer', [])
 
 
 
-      // Dependency-preserving, 3NF tables
-
-    //Step 1: already done above
-    //Step 2:
+    /* Dependency-preserving, 3NF tables */
     var database_3nf_dep_preserving = [];
     for(var k=0;k<$scope.minCoverMergedLHS.elements.length;++k) {
       var fdX = $scope.minCoverMergedLHS.elements[k];
       var table = new Relation(fdX);
       database_3nf_dep_preserving.push(table);
     }
-    //Step 3:
     var minCoverAttributes = $scope.minCoverMergedLHS.attributeSet();
     var leftOverAttributes = [];
     for(var l=0;l<allAttributes.length;++l) {
@@ -114,40 +110,35 @@ angular.module('dbNormalizer', [])
         leftOverAttributes.push(a);
       }
     }
-
-    if(!leftOverAttributes.isEmpty()){
+    if(!leftOverAttributes.isEmpty()) {
       var tableOfLeftOverAttributes = new Relation(leftOverAttributes,leftOverAttributes);
       database_3nf_dep_preserving.push(tableOfLeftOverAttributes);
     }
 
+    /* Save it to show it to the user */
     $scope.dependencyPreserving3NFTables = database_3nf_dep_preserving;
 
 
+    /* Lossless join version of the previous tables */
 
+    var findRedundantTable = function(database) {
 
-
-    // Lossless join version of the previous tables
-
-    // Define a function we'll be using
-    var findRedundantTable = function(database){
-
-      //Find and return any relation within: database whose attributes are all contained within another
-      //table
+      /**
+       * Find and return any relation within: database whose attributes are all
+       * contained within another table
+       */
       for(var i=0;i<database.length;++i) {
         var r = database[i];
         for(var j=0;j<database.length;++j) {
           var r2 = database[j];
-          if(r != r2 && r2.containsAll(r)) {
+          if(r != r2 && r2.containsAll(r))
             return r;
-          }
         }
       }
 
       return null;
     };
 
-
-    //Step 1 & 2
     var database_3nf_lossless_join_dep_preserving = [];
     for(var n=0;n<$scope.minCoverMergedLHS.elements.length;++n) {
       var fdY = $scope.minCoverMergedLHS.elements[n];
@@ -155,8 +146,10 @@ angular.module('dbNormalizer', [])
       database_3nf_lossless_join_dep_preserving.push(tableY);
     }
 
-    //Step 3: Ensure decomposition contains a key for an imaginary table
-    //        consisting of all the attributes
+    /**
+     * Ensure decomposition contains a key for an imaginary table consisting of
+     * all the attributes
+     */
     var keyFound = false;
     for(var o=0;o<database_3nf_lossless_join_dep_preserving.length;++o) {
       var tableZ = database_3nf_lossless_join_dep_preserving[o];
@@ -165,14 +158,14 @@ angular.module('dbNormalizer', [])
         keyFound = true;
         break;
       }
-
     }
     if(!keyFound)
       database_3nf_lossless_join_dep_preserving.push(new Relation(candidateKey,candidateKey));
 
-    //Step 4: Remove any redundant tables
-    //A table is redundant if all of its attributes appears in some other table.
-
+    /**
+     * Remove any redundant tables a table is redundant if all of its attributes
+     * appears in some other table.
+     */
     var redundantTable = null;
     while((redundantTable = findRedundantTable(database_3nf_lossless_join_dep_preserving)) !== null){
       database_3nf_lossless_join_dep_preserving.remove(redundantTable);
@@ -182,6 +175,8 @@ angular.module('dbNormalizer', [])
     $scope.losslessJoinDependencyPreserving3NFTables = database_3nf_lossless_join_dep_preserving;
 
   };
+
+  /* Clears all of the stored information we have about any FDs */
   $scope.reset = function() {
     $scope.functionalDependencies = null;
     $scope.singleRightHandSides = null;

@@ -1,7 +1,6 @@
 /**
- * parseInput takes an array of strings that represent functional dependencies
- * and returns them as an array of objects containing functionaldependency
- * objects.
+ * Takes an array of strings that represent functional dependencies and returns
+ * them as an array of objects containing functionaldependency objects.
  */
 var parseInput = function(lines) {
 
@@ -15,13 +14,13 @@ var parseInput = function(lines) {
       var lhs = line.substring(0, arrowIndex).trim().split(',');
       var rhs = line.substring(arrowIndex + 2, line.length).trim().split(',');
 
-      // Trim all the individual attributes
+      /* Trim all the individual attributes */
       for(var j=0;j<lhs.length;++j)
         lhs[j] = lhs[j].trim();
       for(var k=0;k<rhs.length;++k)
         rhs[k] = rhs[k].trim();
 
-      // Make sure they're nonzero and add them to the list
+      /* Make sure they're nonzero and add them to the list */
       if(lhs.length > 0 && rhs.length > 0) {
         var functionalDependency = new FunctionalDependency(lhs, rhs);
         functionalDependencies.add(functionalDependency);
@@ -30,5 +29,4 @@ var parseInput = function(lines) {
   }
 
   return functionalDependencies;
-
 };

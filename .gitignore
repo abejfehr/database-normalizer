@@ -1,2 +1,5 @@
-#Ignore the design psd for the website
+# Ignore the design psd for the website
 *.psd
+
+# Don't upload the node modules
+node_modules

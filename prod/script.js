@@ -156,7 +156,7 @@ Array.prototype.candidateKeys = function(superkeys, theFDs) {
     // Can't make it any smaller
     var candidateKeys = [];
     candidateKeys.push(aSuperkey);
-    candidateKeys = candidateKeys.concat(candidateKeys(superkeys, theFDs));
+    candidateKeys = candidateKeys.concat(this.candidateKeys(superkeys, theFDs));
     return candidateKeys;
 
   }
